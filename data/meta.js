@@ -1,1 +1,1 @@
-const META={"updated": "08.04.2026", "locations": 9100, "mts": 3454, "a1": 2911, "yettel": 2754};
+const META={"updated": "11.04.2026", "locations": 9037, "mts": 3454, "a1": 2899, "yettel": 2748, "source_bytes": 36265070};

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Srbija — Bazne Stanice</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
+<!-- ═══ Google AdSense — zameni ca-pub-XXXXXXXXXXXXXXXX sa tvojim Publisher ID ═══ -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0f12;--bg2:#141720;--bg3:#1c2030;--bg4:#242840;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--text:#e8eaf0;--text2:#8b90a8;--text3:#555c78;--accent:#f59e0b;--accent2:#fbbf24;--accent-dim:rgba(245,158,11,0.12);--mts:#e63946;--a1:#e91e8c;--yettel:#8bc34a;--r:6px;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:1000}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:28px;height:28px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.05em}
+.logo-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.header-stats{display:flex;gap:24px;align-items:center}
+.stat-pill{font-family:var(--mono);font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.stat-pill span{color:var(--accent2);font-weight:700}
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:300px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sidebar-top{padding:14px 16px;border-bottom:1px solid var(--border)}
+
+/* City search */
+.city-search-wrap{position:relative;margin-bottom:10px}
+.city-search-wrap input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 12px 8px 34px;outline:none;transition:border-color .15s}
+.city-search-wrap input:focus{border-color:var(--accent)}
+.city-search-wrap input::placeholder{color:var(--text3)}
+.city-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.city-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);z-index:9999;overflow:hidden;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.city-results.open{display:block}
+.city-result-item{padding:9px 12px;font-size:12px;cursor:pointer;color:var(--text2);transition:background .1s;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.city-result-item:last-child{border-bottom:none}
+.city-result-item:hover{background:var(--bg4);color:var(--text)}
+.city-result-item svg{flex-shrink:0;color:var(--text3)}
+.city-divider{height:1px;background:var(--border);margin:8px 0}
+
+/* Station search */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 12px 8px 34px;outline:none;transition:border-color .15s}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap input::placeholder{color:var(--text3)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+
+.filter-label{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.filter-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.filter-btn{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s}
+.filter-btn:hover{border-color:var(--border2);color:var(--text)}
+.filter-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent2)}
+.filter-btn[data-op="0"].active{background:rgba(230,57,70,.15);border-color:var(--mts);color:#ff6b75}
+.filter-btn[data-op="1"].active{background:rgba(233,30,140,.15);border-color:var(--a1);color:#ff5ab8}
+.filter-btn[data-op="2"].active{background:rgba(139,195,74,.15);border-color:var(--yettel);color:#a8d96a}
+.results-count{font-size:11px;color:var(--text3);font-family:var(--mono);padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.results-count b{color:var(--accent2)}
+.station-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent}
+.station-list::-webkit-scrollbar{width:4px}
+.station-list::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+.station-item{padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;display:flex;align-items:flex-start;gap:10px}
+.station-item:hover{background:var(--bg3)}
+.station-item.active{background:var(--bg3);border-left:2px solid var(--accent);padding-left:14px}
+.op-pips{display:flex;flex-direction:column;gap:3px;padding-top:3px;flex-shrink:0}
+.op-pip{width:7px;height:7px;border-radius:50%}
+.pip-0{background:var(--mts);box-shadow:0 0 4px rgba(230,57,70,.5)}
+.pip-1{background:var(--a1);box-shadow:0 0 4px rgba(233,30,140,.5)}
+.pip-2{background:var(--yettel);box-shadow:0 0 4px rgba(139,195,74,.5)}
+.si-info{flex:1;min-width:0}
+.si-loc{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.si-addr{font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.si-meta{font-family:var(--mono);font-size:10px;display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.tech-badge{font-size:9px;font-family:var(--mono);font-weight:700;padding:1px 4px;border-radius:3px}
+.t2g{background:rgba(136,135,128,.18);color:#8a8fa8}
+.t3g{background:rgba(55,138,221,.18);color:#5b9cdf}
+.t4g{background:rgba(245,158,11,.18);color:#f5a623}
+.t5g{background:rgba(99,153,34,.18);color:#87c72a}
+#map{flex:1;background:#0d0f12}
+
+/* Popup */
+.leaflet-popup-content-wrapper{background:var(--bg2)!important;border:1px solid var(--border2)!important;border-radius:10px!important;box-shadow:0 8px 32px rgba(0,0,0,.7)!important;padding:0!important;min-width:320px;max-width:420px}
+.leaflet-popup-content{margin:0!important;color:var(--text)}
+.leaflet-popup-tip{background:var(--bg2)!important}
+.leaflet-popup-close-button{color:var(--text2)!important;font-size:18px!important;top:10px!important;right:12px!important}
+.leaflet-popup-close-button:hover{color:var(--text)!important}
+.popup-wrap{font-family:var(--sans);border-radius:10px;overflow:hidden}
+.popup-header{padding:14px 16px 12px;border-bottom:1px solid var(--border)}
+.popup-loc{font-size:14px;font-weight:600;color:var(--text);line-height:1.3;padding-right:20px;margin-bottom:4px}
+.popup-addr{font-size:11px;color:var(--text3);line-height:1.4;margin-bottom:6px}
+.popup-coords{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.popup-coords span{color:var(--accent2)}
+.popup-ops{display:flex;flex-direction:column}
+.popup-op-block{border-top:1px solid var(--border)}
+.popup-op-header{padding:10px 16px 8px;display:flex;align-items:center;gap:8px}
+.popup-op-name{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em}
+.popup-op-towers{font-size:10px;color:var(--text3);font-family:var(--mono);margin-left:auto}
+.popup-sec-table{width:100%;border-collapse:collapse;font-size:11px;margin:0 0 10px}
+.popup-sec-table th{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:3px 16px;border-bottom:1px solid var(--border);font-weight:400;text-align:left}
+.popup-sec-table td{padding:5px 16px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2)}
+.popup-sec-table tr:last-child td{border-bottom:none}
+.popup-sec-table .sec-id{font-family:var(--mono);color:var(--text3);font-size:10px}
+.popup-sec-table .freq{font-family:var(--accent2);color:var(--accent2);font-family:var(--mono);font-size:10px}
+.status-active{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:var(--mono);color:#87c72a}
+.s-dot{width:5px;height:5px;border-radius:50%;background:#87c72a;animation:pg 2s infinite;display:inline-block}
+@keyframes pg{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* clusters */
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(13,15,18,.7)!important}
+.marker-cluster-small div{background:rgba(245,158,11,.18)!important;color:var(--accent2)!important;font-family:var(--mono)!important;font-size:11px!important;font-weight:700!important}
+.marker-cluster-medium div{background:rgba(245,158,11,.32)!important;color:var(--accent2)!important;font-family:var(--mono)!important;font-size:11px!important;font-weight:700!important}
+.marker-cluster-large div{background:rgba(245,158,11,.5)!important;color:#0d0f12!important;font-family:var(--mono)!important;font-size:11px!important;font-weight:700!important}
+
+.no-results{padding:40px 16px;text-align:center;color:var(--text3);font-size:13px}
+.list-hint{padding:14px 16px;text-align:center;color:var(--text3);font-size:11px;font-family:var(--mono);line-height:1.6;border-top:1px solid var(--border)}
+@media(max-width:900px){.sidebar{width:250px}.header-stats{display:none}}
+@media(max-width:640px){.sidebar{display:none}}
+
+/* ── Ads ── */
+.ad-slot{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 10px;flex-shrink:0;text-align:center}
+.ad-slot ins{display:block}
+.ad-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;opacity:.5}
+/* Mobile sticky bottom */
+.ad-mobile{display:none;position:fixed;bottom:0;left:0;right:0;z-index:2000;background:var(--bg2);border-top:1px solid var(--border);padding:5px;text-align:center}
+@media(max-width:640px){
+  .ad-mobile{display:block}
+  body{padding-bottom:60px}
+}
+@media(max-width:640px){.ad-slot{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#0d0f12"><rect x="10" y="2" width="4" height="20"/><path d="M5 6Q12 3 19 6M3 11Q12 7 21 11M1 16Q12 11 23 16" stroke="#0d0f12" stroke-width="1.8" fill="none"/></svg>
+    </div>
+    <div>
+      <div class="logo-text">BS_MAPA.RS</div>
+      <div class="logo-sub">Registar baznih stanica · RATEL reg221</div>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill">Lokacija: <span id="visible-count">—</span></div>
+    <div class="stat-pill">Ukupno: <span id="total-count">—</span></div>
+    <div class="stat-pill">Ažurirano: <span id="last-updated">—</span></div>
+  </div>
+</header>
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-top">
+
+      <!-- City / location search -->
+      <div class="filter-label">Pronađi grad ili mesto</div>
+      <div class="city-search-wrap">
+        <span class="city-icon">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </span>
+        <input type="text" id="city-input" placeholder="npr. Beograd, Novi Sad, Niš...">
+        <div class="city-results" id="city-results"></div>
+      </div>
+
+      <div class="city-divider"></div>
+
+      <!-- Station filter search -->
+      <div class="search-wrap">
+        <span class="search-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+        <input type="text" id="search-input" placeholder="Pretraži stanicu, adresu...">
+      </div>
+      <div class="filter-label">Operator</div>
+      <div class="filter-group" id="op-filters">
+        <button class="filter-btn active" data-op="all">Svi</button>
+        <button class="filter-btn" data-op="0" style="color:#ff6b75">MTS</button>
+        <button class="filter-btn" data-op="1" style="color:#ff5ab8">A1</button>
+        <button class="filter-btn" data-op="2" style="color:#a8d96a">Yettel</button>
+      </div>
+      <div class="filter-label">Tehnologija</div>
+      <div class="filter-group" id="tech-filters">
+        <button class="filter-btn active" data-tech="all">Sve</button>
+        <button class="filter-btn" data-tech="1">2G</button>
+        <button class="filter-btn" data-tech="2">3G</button>
+        <button class="filter-btn" data-tech="4">4G</button>
+        <button class="filter-btn" data-tech="8">5G</button>
+      </div>
+    </div>
+    <!-- ═══ AdSense sidebar oglas (responsive) ═══
+         Zameni data-ad-client i data-ad-slot vrednostima sa AdSense naloga -->
+    <div class="ad-slot">
+      <div class="ad-label">Oglas</div>
+      <ins class="adsbygoogle"
+           style="display:block;min-height:90px"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+           data-ad-slot="XXXXXXXXXX"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+    <!-- ═══ Kraj sidebar oglasa ═══ -->
+    <div class="results-count" id="results-count">Učitavanje...</div>
+    <div class="station-list" id="station-list"><div class="no-results">Učitavanje...</div></div>
+  </div>
+  <div id="map"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="data/towers.js"></script>
+<script src="data/meta.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<script>
+/* LOCS loaded from data/towers.js */
+/* META loaded from data/meta.js */
+
+const OPS=['MTS','A1','Yettel'];
+const OP_COLORS=['#e63946','#e91e8c','#8bc34a'];
+const OP_BRIGHT=['#ff6b75','#ff5ab8','#a8d96a'];
+const TECH_NAMES={1:'2G',2:'3G',4:'4G',8:'5G'};
+const TECH_CLS={1:'t2g',2:'t3g',4:'t4g',8:'t5g'};
+const TECH_ALL=[1,2,4,8];
+
+let filterOp='all', filterTech='all', searchQ='';
+
+// Map
+const map=L.map('map',{center:[44.2,20.9],zoom:7,preferCanvas:true});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19
+}).addTo(map);
+
+const cluster=L.markerClusterGroup({
+  maxClusterRadius:45,spiderfyOnMaxZoom:true,showCoverageOnHover:false,
+  zoomToBoundsOnClick:true,chunkedLoading:true,chunkInterval:50,chunkDelay:50
+});
+map.addLayer(cluster);
+
+// Icons
+const iconCache={};
+function makeIcon(opMask,sel,has5g){
+  const key=opMask+'_'+(sel?1:0)+'_'+(has5g?1:0);
+  if(iconCache[key]) return iconCache[key];
+  const ops=[0,1,2].filter(i=>opMask&(1<<i));
+  const sz=sel?16:10;
+  let dot;
+  if(ops.length===1){
+    const c=OP_COLORS[ops[0]];
+    dot=`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${c};border:1.5px solid rgba(255,255,255,${sel?.7:.25});box-shadow:0 0 ${sel?10:5}px ${c};flex-shrink:0"></div>`;
+  } else {
+    const slice=360/ops.length;
+    const stops=ops.map((o,i)=>`${OP_COLORS[o]} ${i*slice}deg ${(i+1)*slice}deg`).join(',');
+    dot=`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:conic-gradient(${stops});border:1.5px solid rgba(255,255,255,${sel?.7:.3});box-shadow:0 0 ${sel?10:5}px rgba(255,255,255,.2);flex-shrink:0"></div>`;
+  }
+  const badge=has5g?`<span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:#87c72a;background:rgba(99,153,34,0.22);border:1px solid rgba(99,153,34,0.5);border-radius:3px;padding:0 3px;line-height:14px;white-space:nowrap;flex-shrink:0">5G</span>`:'';
+  const wrapHtml=has5g?`<div style="display:flex;align-items:center;gap:3px;pointer-events:none">${dot}${badge}</div>`:dot;
+  const w=has5g?sz+26:sz;
+  iconCache[key]=L.divIcon({className:'',html:wrapHtml,iconSize:[w,sz],iconAnchor:[sz/2,sz/2]});
+  return iconCache[key];
+}
+
+// Popup
+function buildPopup(loc){
+  const [lon,lat,addr,techMask,opMask,opsData]=loc;
+  const techBadges=TECH_ALL.filter(b=>techMask&b).map(b=>`<span class="tech-badge ${TECH_CLS[b]}">${TECH_NAMES[b]}</span>`).join('');
+  const opBlocks=opsData.map(([opIdx,towers])=>{
+    const totalSectors=towers.reduce((s,t)=>s+t[2].length,0);
+    const rows=towers.map(([tid,locName,sectors])=>
+      sectors.map(([sec,freq,tech])=>
+        `<tr><td class="sec-id">${tid}.${sec}</td><td class="freq">${freq} MHz</td><td><span class="tech-badge ${TECH_CLS[{'2G':1,'3G':2,'4G':4,'5G':8}[tech]]}">${tech}</span></td><td style="text-align:center"><span class="status-active"><span class="s-dot"></span>OK</span></td></tr>`
+      ).join('')
+    ).join('');
+    return `<div class="popup-op-block">
+      <div class="popup-op-header">
+        <div style="width:8px;height:8px;border-radius:50%;background:${OP_COLORS[opIdx]};box-shadow:0 0 5px ${OP_COLORS[opIdx]}"></div>
+        <span class="popup-op-name" style="color:${OP_BRIGHT[opIdx]}">${OPS[opIdx]}</span>
+        <span class="popup-op-towers">${towers.length} toranj${towers.length>1?'a':''} · ${totalSectors} sektor${totalSectors!==1?'a':''}</span>
+      </div>
+      <table class="popup-sec-table">
+        <thead><tr><th>ID Sektora</th><th>Frekvencija</th><th>Tehnol.</th><th style="text-align:center">Status</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+  return `<div class="popup-wrap">
+    <div class="popup-header">
+      <div class="popup-loc">${opsData.map(([oi,t])=>t[0][1]).join(' / ')}</div>
+      <div class="popup-addr">${addr}</div>
+      <div class="popup-coords">LAT <span>${lat.toFixed(5)}</span>&nbsp;&nbsp;LON <span>${lon.toFixed(5)}</span>&nbsp;&nbsp;${techBadges}</div>
+    </div>
+    <div class="popup-ops">${opBlocks}</div>
+  </div>`;
+}
+
+// Markers
+const markerArr=new Array(LOCS.length).fill(null);
+let lastSel=null;
+function getMarker(i){
+  if(markerArr[i]) return markerArr[i];
+  const loc=LOCS[i];
+  const m=L.marker([loc[1],loc[0]],{icon:makeIcon(loc[4],false,loc[3]&8)});
+  m.bindPopup(()=>buildPopup(loc),{maxWidth:440,minWidth:320,closeButton:true,autoPan:true});
+  m.on('click',()=>onMarkerClick(i,m));
+  m.on('popupclose',resetSelection);
+  markerArr[i]=m;
+  return m;
+}
+function onMarkerClick(i,m){
+  if(lastSel!==null&&lastSel!==i&&markerArr[lastSel]) markerArr[lastSel].setIcon(makeIcon(LOCS[lastSel][4],false,LOCS[lastSel][3]&8));
+  lastSel=i; m.setIcon(makeIcon(LOCS[i][4],true,LOCS[i][3]&8)); syncList(i);
+}
+function resetSelection(){
+  if(lastSel!==null&&markerArr[lastSel]) markerArr[lastSel].setIcon(makeIcon(LOCS[lastSel][4],false,LOCS[lastSel][3]&8));
+  lastSel=null;
+  document.querySelectorAll('.station-item').forEach(el=>el.classList.remove('active'));
+}
+
+// Filters
+function matches(loc){
+  if(filterOp!=='all'&&!(loc[4]&(1<<parseInt(filterOp)))) return false;
+  if(filterTech!=='all'&&!(loc[3]&parseInt(filterTech))) return false;
+  if(searchQ){
+    const q=searchQ.toLowerCase();
+    const name=loc[5].map(([oi,tw])=>tw.map(t=>t[1]).join(' ')).join(' ').toLowerCase();
+    if(!name.includes(q)&&!loc[2].toLowerCase().includes(q)) return false;
+  }
+  return true;
+}
+let filteredIdx=[];
+function applyFilters(){
+  cluster.clearLayers();
+  filteredIdx=[];
+  const batch=[];
+  for(let i=0;i<LOCS.length;i++){
+    if(matches(LOCS[i])){filteredIdx.push(i);batch.push(getMarker(i));}
+  }
+  cluster.addLayers(batch);
+  const n=filteredIdx.length;
+  document.getElementById('visible-count').textContent=n.toLocaleString();
+  document.getElementById('total-count').textContent=LOCS.length.toLocaleString();
+  document.getElementById('results-count').innerHTML=`Prikazano <b>${n.toLocaleString()}</b> od ${LOCS.length.toLocaleString()} lokacija`;
+  renderList();
+}
+function renderList(){
+  const list=document.getElementById('station-list');
+  const show=filteredIdx.slice(0,200);
+  if(!show.length){list.innerHTML='<div class="no-results">Nema rezultata.</div>';return;}
+  const html=show.map(i=>{
+    const loc=LOCS[i];
+    const ops=loc[5].map(([oi])=>oi);
+    const pips=ops.map(oi=>`<div class="op-pip pip-${oi}"></div>`).join('');
+    const name=loc[5][0][1][0][1];
+    const techs=TECH_ALL.filter(b=>loc[3]&b).map(b=>`<span class="tech-badge ${TECH_CLS[b]}">${TECH_NAMES[b]}</span>`).join('');
+    const opLabels=ops.map(oi=>`<span style="color:${OP_BRIGHT[oi]};font-weight:700;font-family:var(--mono);font-size:10px">${OPS[oi]}</span>`).join('<span style="color:var(--text3);margin:0 2px">·</span>');
+    return `<div class="station-item" onclick="clickItem(${i})" data-idx="${i}">
+      <div class="op-pips">${pips}</div>
+      <div class="si-info">
+        <div class="si-loc">${name}</div>
+        <div class="si-addr">${loc[2].substring(0,55)}${loc[2].length>55?'..':''}</div>
+        <div class="si-meta">${opLabels}&nbsp;${techs}</div>
+      </div>
+    </div>`;
+  }).join('');
+  list.innerHTML=html+(filteredIdx.length>200?`<div class="list-hint">Prvih 200 od ${filteredIdx.length.toLocaleString()} lokacija.<br>Koristite filtere ili pretragu.</div>`:'');
+}
+function syncList(i){
+  document.querySelectorAll('.station-item').forEach(el=>el.classList.toggle('active',parseInt(el.dataset.idx)===i));
+  const el=document.querySelector(`.station-item[data-idx="${i}"]`);
+  if(el) el.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function clickItem(i){
+  document.querySelectorAll('.station-item').forEach(el=>el.classList.toggle('active',parseInt(el.dataset.idx)===i));
+  const loc=LOCS[i];
+  if(lastSel!==null&&lastSel!==i&&markerArr[lastSel]) markerArr[lastSel].setIcon(makeIcon(LOCS[lastSel][4],false,LOCS[lastSel][3]&8));
+  lastSel=i;
+  map.setView([loc[1],loc[0]],Math.max(map.getZoom(),14),{animate:true,duration:0.5});
+  setTimeout(()=>{const m=getMarker(i);m.setIcon(makeIcon(loc[4],true,loc[3]&8));m.openPopup();},420);
+}
+
+// Filter buttons
+document.querySelectorAll('#op-filters .filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#op-filters .filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); filterOp=btn.dataset.op; applyFilters();
+  });
+});
+document.querySelectorAll('#tech-filters .filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#tech-filters .filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); filterTech=btn.dataset.tech; applyFilters();
+  });
+});
+let st=null;
+document.getElementById('search-input').addEventListener('input',e=>{
+  clearTimeout(st);st=setTimeout(()=>{searchQ=e.target.value;applyFilters();},300);
+});
+
+// ── City search using Nominatim (OpenStreetMap geocoder) ──────────────────
+const cityInput=document.getElementById('city-input');
+const cityResults=document.getElementById('city-results');
+let cityTimer=null;
+
+cityInput.addEventListener('input',()=>{
+  clearTimeout(cityTimer);
+  const q=cityInput.value.trim();
+  if(q.length<2){cityResults.classList.remove('open');return;}
+  searchCity(q);
+});
+
+cityInput.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){cityResults.classList.remove('open');cityInput.blur();}
+});
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.city-search-wrap')) cityResults.classList.remove('open');
+});
+
+// ── City search — offline from embedded list ──────────────────────────────
+const CITIES=[["Ada",45.7988,20.1248],["Aleksandrovac",43.4564,21.0484],["Aleksinac",43.5421,21.7063],["Apatin",45.6711,18.9803],["Aranđelovac",44.3043,20.5603],["Arilje",43.7529,20.0955],["Babušnica",43.0693,22.4098],["Bajina Bašta",43.9746,19.5658],["Batočina",44.1541,21.0823],["Bečej",45.6163,20.0326],["Beograd",44.8046,20.4651],["Blace",43.2968,21.2895],["Bogatić",44.8381,19.4836],["Bojnik",42.9832,21.7213],["Boljevac",43.8277,21.9496],["Bor",44.0768,22.0985],["Bosilegrad",42.4997,22.4714],["Brus",43.3832,21.0333],["Bujanovac",42.4584,21.7716],["Čačak",43.8913,20.3491],["Čajetina",43.7481,19.7181],["Ćićevac",43.7185,21.4487],["Ćuprija",43.9285,21.3677],["Crna Trava",42.8074,22.2944],["Despotovac",44.0936,21.4379],["Dimitrovgrad",43.0137,22.7806],["Doljevac",43.1911,21.8399],["Golubac",44.6607,21.6317],["Gornji Milanovac",44.0288,20.4666],["Grocka",44.6677,20.7161],["Inđija",45.0474,20.0826],["Irig",45.1023,19.8538],["Ivanjica",43.5836,20.2308],["Jagodina",43.9769,21.2613],["Kanjiža",46.0652,20.0549],["Kikinda",45.8313,20.4678],["Kladovo",44.6076,22.6094],["Knić",43.9217,20.7225],["Knjaževac",43.5673,22.2575],["Koceljeva",44.4664,19.8189],["Kosjerić",43.9985,19.9131],["Kovačica",45.1108,20.6237],["Kovin",44.7449,20.9731],["Kragujevac",44.0128,20.9114],["Kraljevo",43.7234,20.6889],["Krupanj",44.3647,19.361],["Kruševac",43.5812,21.3345],["Kuršumlija",43.1398,21.2714],["Kučevo",44.4815,21.6673],["Lapovo",44.1812,21.0971],["Lebane",42.9208,21.7378],["Leskovac",42.9981,21.9465],["Loznica",44.5344,19.2263],["Lučani",43.8616,20.1408],["Majdanpek",44.4221,21.9372],["Mali Zvornik",44.3891,19.1044],["Malo Crniće",44.5674,21.2964],["Medveđa",42.8333,21.5756],["Merošina",43.2946,21.7192],["Mionica",44.2487,20.0884],["Mladenovac",44.4319,20.6987],["Negotin",44.2259,22.5322],["Niš",43.3209,21.8954],["Niška Banja",43.2946,22.0169],["Nova Crnja",45.6706,20.5985],["Nova Varoš",43.4585,19.8168],["Novi Bečej",45.5992,20.1306],["Novi Kneževac",45.8667,20.0988],["Novi Pazar",43.1367,20.5126],["Novi Sad",45.2551,19.8452],["Obrenovac",44.6541,20.1946],["Odžaci",45.5086,19.2655],["Opovo",45.0505,20.4318],["Osečina",44.3728,19.5985],["Pančevo",44.8705,20.6405],["Paraćin",43.8643,21.4138],["Petrovac na Mlavi",44.3728,21.4221],["Pirot",43.1545,22.5869],["Plandište",45.2279,21.1218],["Požarevac",44.6215,21.1877],["Požega",43.8481,20.0367],["Preševo",42.3077,21.6509],["Priboj",43.5828,19.5219],["Prijepolje",43.3905,19.6456],["Prokuplje",43.2345,21.5934],["Raška",43.2851,20.6132],["Ražanj",43.6705,21.5515],["Rekovac",43.8607,21.1183],["Ruma",45.0078,19.8234],["Šabac",44.7521,19.6934],["Šid",45.1222,19.2189],["Senta",45.9302,20.0893],["Smederevo",44.6634,20.9289],["Smederevska Palanka",44.3667,20.9571],["Sokobanja",43.6436,21.8665],["Sombor",45.7763,19.1136],["Sopot",44.5162,20.5873],["Srbobran",45.5429,19.7996],["Sremska Mitrovica",44.9734,19.6123],["Sremski Karlovci",45.2027,19.9355],["Stara Pazova",44.9855,20.1615],["Subotica",46.0994,19.6665],["Surčin",44.8024,20.2815],["Surdulica",42.6902,22.1694],["Temerin",45.4083,19.8876],["Titel",45.2004,20.2893],["Topola",44.2547,20.6858],["Trstenik",43.6188,21.0024],["Tutin",42.9948,20.3348],["Ub",44.4564,20.0726],["Užice",43.8567,19.8429],["Valjevo",44.2689,19.8862],["Varvarin",43.7183,21.3626],["Velika Plana",44.3336,21.0758],["Vranje",42.5512,21.9013],["Vrnjačka Banja",43.6232,20.8965],["Vršac",45.1166,21.2988],["Zaječar",43.9023,22.2734],["Žabari",44.3554,21.2135],["Žagubica",44.1957,21.7869],["Žitište",45.4812,20.5469],["Žitorađa",43.1818,21.7173],["Zrenjanin",45.3782,20.3843]];
+
+function searchCity(q){
+  if(!q){cityResults.classList.remove('open');return;}
+  // normalize: remove diacritics for fuzzy matching
+  const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').replace(/[šŠ]/g,'s').replace(/[čČćĆ]/g,'c').replace(/[žŽ]/g,'z');
+  const nq = norm(q);
+  const matches = CITIES.filter(c => norm(c[0]).startsWith(nq))
+    .concat(CITIES.filter(c => !norm(c[0]).startsWith(nq) && norm(c[0]).includes(nq)))
+    .slice(0,8);
+  showCityResults(matches);
+}
+
+function showCityResults(matches){
+  if(!matches.length){
+    cityResults.innerHTML='<div class="city-result-item" style="color:var(--text3);cursor:default">Nema rezultata</div>';
+    cityResults.classList.add('open');
+    return;
+  }
+  cityResults.innerHTML=matches.map(c=>`
+    <div class="city-result-item" onclick="goToCity(${c[1]},${c[2]},'${c[0]}')">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      <span style="color:var(--text);font-size:13px">${c[0]}</span>
+    </div>`).join('');
+  cityResults.classList.add('open');
+}
+
+function goToCity(lat,lon,name){
+  cityResults.classList.remove('open');
+  cityInput.value=name;
+  map.setView([lat,lon],13,{animate:true,duration:0.8});
+}
+
+// Init
+if(typeof META!=='undefined') document.getElementById('last-updated').textContent=META.updated;
+applyFilters();
+</script>
+  <!-- ═══ AdSense mobilni sticky baner (320x50) ═══ -->
+  <div class="ad-mobile">
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:320px;height:50px"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+         data-ad-slot="YYYYYYYYYY"></ins>
+  </div>
+  <script>
+    (adsbygoogle=window.adsbygoogle||[]).push({});
+    (adsbygoogle=window.adsbygoogle||[]).push({});
+  </script>
+</body>
+</html>

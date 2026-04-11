@@ -1,0 +1,11 @@
+# Privremeni fajlovi
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db
+
+# Početni podaci su generisani automatski, ali ih commitujemo
+# da sajt radi odmah po postavljanju
+# data/towers.js
+# data/meta.js

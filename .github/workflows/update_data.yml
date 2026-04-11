@@ -1,0 +1,61 @@
+name: Ažuriranje podataka sa RATEL
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # svakog sata, svaki dan
+
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Prisilno ažuriranje čak i ako nema promena"
+        required: false
+        default: "false"
+        type: boolean
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Preuzimanje i obrada podataka
+        run: |
+          if [ "${{ inputs.force }}" = "true" ]; then
+            python3 scripts/fetch_data.py --force
+          else
+            python3 scripts/fetch_data.py
+          fi
+
+      - name: Provera promena
+        id: check
+        run: |
+          if git diff --quiet data/towers.js data/meta.js 2>/dev/null && [ -f data/towers.js ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit i push
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          DATE=$(date +'%d.%m.%Y %H:%M')
+          COUNT=$(python3 -c "
+          import json, re
+          txt = open('data/towers.js').read()
+          locs = json.loads(re.search(r'const LOCS=(\[.*\]);', txt, re.DOTALL).group(1))
+          print(len(locs))
+          ")
+          git add data/towers.js data/meta.js data/.last_hash
+          git commit -m "RATEL ažuriranje — ${DATE} (${COUNT} lokacija)"
+          git push

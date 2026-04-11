@@ -1,0 +1,1 @@
+const META={"updated": "08.04.2026", "locations": 9100, "mts": 3454, "a1": 2911, "yettel": 2754};

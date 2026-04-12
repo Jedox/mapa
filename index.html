@@ -659,23 +659,15 @@ function buildHistoryPanel() {
   const changelog = (typeof META !== 'undefined' && META.changelog) ? META.changelog : [];
 
   if(!changelog.length) {
+    summaryGrid.style.display = 'none';
     container.innerHTML = `
       <div class="history-empty">
-        <div class="history-empty-icon">📋</div>
-        <div class="history-empty-title">Istorija još nije dostupna</div>
-        <div class="history-empty-text">
-          Kada Python skripta detektuje promene u RATEL CSV fajlu, automatski će ih zabeležiti ovde.
-          Svaka promena će pokazati koliko i kojih baznih stanica je dodato po operateru.
-        </div>
-        <div class="history-empty-code">
-          // Dodati u data/meta.js:<br>
-          META.lastChange = "YYYY-MM-DD HH:MM";<br>
-          META.changelog = [<br>
-          &nbsp;&nbsp;{ date, total, mts, a1, yettel, details }<br>
-          ];
+        <div class="history-empty-icon" style="font-size:32px;opacity:.4;margin-bottom:12px">⏳</div>
+        <div class="history-empty-title" style="font-family:var(--mono);font-size:13px;color:var(--text2);margin-bottom:6px">Čekanje na prve promene</div>
+        <div class="history-empty-text" style="font-size:12px;color:var(--text3);line-height:1.6;max-width:360px">
+          Istorija će se automatski popuniti kada Python skripta detektuje izmene u RATEL CSV fajlu.
         </div>
       </div>`;
-    summaryGrid.style.display = 'none';
     return;
   }
 

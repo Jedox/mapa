@@ -1,6 +1,6 @@
 /* Auto-generisano — ne menjati ručno */
 const META = {
-  updated: "2026-04-12 20:15",
+  updated: "2026-04-12 20:24",
   lastChange: "2026-04-12 20:15",
   changelog:   [
     {

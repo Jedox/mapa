@@ -1,1 +1,14 @@
-const META={"updated": "11.04.2026", "locations": 9037, "mts": 3454, "a1": 2899, "yettel": 2748, "source_bytes": 36265070};
+/* Auto-generisano — ne menjati ručno */
+const META = {
+  updated: "2026-04-12 20:11",
+  lastChange: "2026-04-12 20:11",
+  changelog:   [
+    {
+      "date": "2026-04-12 20:11",
+      "total": 0,
+      "mts": 0,
+      "a1": 0,
+      "yettel": 0
+    }
+  ],
+};

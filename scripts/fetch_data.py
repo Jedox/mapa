@@ -238,8 +238,12 @@ def main():
 
     print(f"[{now_str()}] Preuzimanje CSV sa RATEL-a...")
     try:
+        import ssl
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
         req = urllib.request.Request(RATEL_URL, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=60) as resp:
+        with urllib.request.urlopen(req, timeout=60, context=ctx) as resp:
             raw = resp.read()
     except Exception as e:
         print(f"  GREŠKA: {e}", file=sys.stderr)

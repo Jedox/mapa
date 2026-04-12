@@ -199,32 +199,61 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20p
 .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:490;backdrop-filter:blur(2px)}
 .sidebar-backdrop.visible{display:block}
 
+/* ── Leaflet zoom — desna strana da ne smeta sidebaru ── */
+.leaflet-top.leaflet-left{left:auto!important;right:10px!important;top:10px!important}
+
 /* ── Responsive ── */
 @media(max-width:900px){
   .sidebar{width:260px}
-  .header-stats{gap:10px}
-  .stat-pill:nth-child(n+3){display:none}
+  .header-stats{gap:8px}
+  .stat-pill:nth-child(n+4){display:none}
 }
 @media(max-width:640px){
-  .hamburger{display:flex}
+  /* Header — dva reda */
+  header{height:auto;flex-wrap:wrap;padding:8px 12px 0;gap:6px}
+  .logo-sub{display:none}
+  .logo-text{font-size:12px}
+  .logo-icon{width:24px;height:24px}
+  .hamburger{display:flex;width:32px;height:32px}
+
+  /* Stats — drugi red, horizontalni scroll */
+  .header-stats{
+    width:100%;order:3;
+    justify-content:flex-start;
+    gap:0;
+    border-top:1px solid var(--border);
+    padding:5px 0 6px;
+    overflow-x:auto;flex-wrap:nowrap;
+    scrollbar-width:none;
+  }
+  .header-stats::-webkit-scrollbar{display:none}
+  .stat-pill{
+    display:flex!important;font-size:10px;
+    padding:0 10px;
+    border-right:1px solid var(--border);
+    white-space:nowrap;flex-shrink:0;
+  }
+  .stat-pill:last-child{border-right:none}
+
+  /* Sidebar */
   .sidebar{
     position:fixed;top:0;left:0;bottom:0;
     width:300px;max-width:90vw;
     transform:translateX(-100%);
     z-index:600;
     box-shadow:4px 0 24px rgba(0,0,0,.6);
-    padding-top:52px
+    padding-top:0
   }
   .sidebar.mobile-open{transform:translateX(0)}
-  .header-stats .stat-pill:nth-child(n+2){display:none}
   .ad-mobile{display:block}
   body{padding-bottom:60px}
-  .tab-btn{padding:10px 14px;font-size:10px}
+  .tab-btn{padding:10px 12px;font-size:10px;gap:5px}
   #panel-history{padding:16px}
   .history-summary-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:400px){
   .history-summary-grid{grid-template-columns:1fr}
+  .stat-pill{font-size:9px;padding:0 8px}
 }
 @media(max-width:640px){.ad-slot{display:none}}
 </style>
@@ -241,7 +270,7 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20p
     </div>
     <div>
       <div class="logo-text">BS_MAPA.RS</div>
-      <div class="logo-sub">Registar baznih stanica · RATEL</div>
+      <div class="logo-sub">Registar baznih stanica · RATEL reg221</div>
     </div>
   </div>
   <div class="header-stats">

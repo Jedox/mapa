@@ -1,192 +1,326 @@
 #!/usr/bin/env python3
 """
-Preuzima CSV sa RATEL registra (reg221) i generiše data/towers.js i data/meta.js
-koji se koriste na BS Mapa sajtu.
+fetch_bs.py — RATEL BS Mapa ažuriranje
+--------------------------------------
+Preuzima CSV sa RATEL sajta, generiše:
+  - data/towers.js   (lokacije i sektori za mapu)
+  - data/meta.js     (statistika + istorija promena)
 
-Pokretanje: python3 scripts/fetch_data.py
+Pokretanje: python3 scripts/fetch_bs.py
 """
 
-import sys
-import os
-import json
+import csv
 import hashlib
-import urllib.request
-import urllib.error
-import ssl
-import datetime
 import io
+import json
+import os
+import re
+import sys
+from collections import defaultdict
+from datetime import datetime, timezone
 
-CSV_URL = "https://registar.ratel.rs/sr/reg221?action=table&format=csv&nosilac_prava=&primenjena_tehnologija=&filter="
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
-TOWERS_JS = os.path.join(DATA_DIR, "towers.js")
-META_JS   = os.path.join(DATA_DIR, "meta.js")
-HASH_FILE = os.path.join(DATA_DIR, ".last_hash")
+import urllib.request
 
-os.makedirs(DATA_DIR, exist_ok=True)
+# ── Konfiguracija ────────────────────────────────────────────────────────────
 
+RATEL_URL = "https://registar.ratel.rs/reg221/csv"   # prilagodi ako se URL promeni
+DATA_DIR   = os.path.join(os.path.dirname(__file__), "..", "data")
+TOWERS_JS  = os.path.join(DATA_DIR, "towers.js")
+META_JS    = os.path.join(DATA_DIR, "meta.js")
+HASH_FILE  = os.path.join(DATA_DIR, ".csv_hash")       # čuva hash prethodnog CSV-a
+CHANGELOG_FILE = os.path.join(DATA_DIR, "changelog.json")  # persists između runa
 
-def fetch_csv() -> bytes:
-    print(f"Preuzimam CSV sa: {CSV_URL}")
-    # RATEL ima self-signed / nedostaje intermediate cert — ignorišemo SSL
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
+# Operateri — mapiranje naziva iz CSV-a na indeks
+OP_MAP = {
+    "mts": 0, "telekom": 0, "srbija": 0,
+    "a1":  1, "vip": 1, "telenor": 1,
+    "yettel": 2, "open": 2,
+}
+OP_NAMES = ["MTS", "A1", "Yettel"]
 
-    req = urllib.request.Request(
-        CSV_URL,
-        headers={
-            "User-Agent": "Mozilla/5.0 (compatible; BS-Mapa/1.0)",
-            "Accept": "text/csv,text/plain,*/*",
-        }
-    )
-    with urllib.request.urlopen(req, context=ctx, timeout=120) as resp:
-        data = resp.read()
-    print(f"Preuzeto {len(data):,} bajtova")
-    return data
+# Tehnologije — mapiranje iz CSV-a na bit masku
+TECH_MAP = {"2g": 1, "gsm": 1, "3g": 2, "umts": 2, "4g": 4, "lte": 4, "5g": 8, "nr": 8}
 
+# Maksimalan broj unosa u changelog (čuva se u meta.js)
+MAX_CHANGELOG = 50
 
-def csv_hash(data: bytes) -> str:
+# ── Pomoćne funkcije ─────────────────────────────────────────────────────────
+
+def now_str():
+    """Trenutno vreme u UTC, formatiran kao string."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
+
+def sha256_of(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
-
-def load_last_hash() -> str:
+def load_prev_hash() -> str:
     if os.path.exists(HASH_FILE):
-        return open(HASH_FILE).read().strip()
+        with open(HASH_FILE, "r") as f:
+            return f.read().strip()
     return ""
 
-
 def save_hash(h: str):
-    open(HASH_FILE, "w").write(h)
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(HASH_FILE, "w") as f:
+        f.write(h)
 
+def load_changelog() -> list:
+    if os.path.exists(CHANGELOG_FILE):
+        with open(CHANGELOG_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
 
-def process(raw: bytes) -> list:
-    """Parsira CSV i grupiše po fizičkoj lokaciji (lat, lon)."""
-    import csv
+def save_changelog(log: list):
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(CHANGELOG_FILE, "w", encoding="utf-8") as f:
+        json.dump(log, f, ensure_ascii=False, indent=2)
 
-    # UTF-16 BOM → decode
-    text = raw.decode("utf-16")
-    reader = csv.DictReader(io.StringIO(text), delimiter="\t")
+def detect_operator(name: str) -> int:
+    """Prepoznaj operatera iz naziva kolone/vrednosti. Vrati indeks 0/1/2 ili -1."""
+    n = name.lower()
+    for key, idx in OP_MAP.items():
+        if key in n:
+            return idx
+    return -1
 
-    op_map = {"Telekom Srbija": 0, "A1": 1, "Yettel": 2}
-    tech_bit = {"2G": 1, "3G": 2, "4G": 4, "5G": 8}
-
-    rows = []
-    for r in reader:
-        op = op_map.get(r["Nosilac prava (operator)"])
-        if op is None:
-            continue
-        try:
-            lat = round(float(r["Geografska širina"]), 5)
-            lon = round(float(r["Geografska dužina"]), 5)
-        except (ValueError, KeyError):
-            continue
-
-        ev = str(r["Evidencioni broj"]).strip()
-        parts = ev.rsplit(".", 1)
-        tower_id = parts[0]
-        sector   = parts[1] if len(parts) > 1 else "0"
-        freq_raw = r.get("Radiofrekvencijski opseg", "0").strip()
-        try:
-            freq = int(float(freq_raw))
-        except ValueError:
-            freq = 0
-        tech = r.get("Primenjena tehnologija", "").strip()
-        loc_name = r.get("Naziv mesta", "").strip()
-        addr     = r.get("Adresa", "").strip()
-
-        rows.append((lat, lon, addr, op, tower_id, sector, freq, tech, loc_name))
-
-    print(f"Parsirano {len(rows):,} redova")
-
-    # Group by (lat, lon)
-    from collections import defaultdict
-    loc_map = defaultdict(lambda: {"addr": "", "ops": defaultdict(lambda: defaultdict(list))})
-
-    for lat, lon, addr, op, tid, sec, freq, tech, loc_name in rows:
-        key = (lat, lon)
-        entry = loc_map[key]
-        if not entry["addr"]:
-            entry["addr"] = addr
-        entry["ops"][op][tid].append((sec, freq, tech, loc_name))
-
-    records = []
-    for (lat, lon), entry in loc_map.items():
-        tech_mask = 0
-        op_mask   = 0
-        ops_data  = []
-
-        for op_idx in sorted(entry["ops"].keys()):
-            op_mask |= (1 << op_idx)
-            towers_data = []
-            for tid, secs in entry["ops"][op_idx].items():
-                seen = set()
-                sec_list = []
-                loc_name = ""
-                for sec, freq, tech, lname in secs:
-                    k = (sec, freq, tech)
-                    if k not in seen:
-                        seen.add(k)
-                        sec_list.append([sec, freq, tech])
-                        tech_mask |= tech_bit.get(tech, 0)
-                    if not loc_name:
-                        loc_name = lname
-                sec_list.sort(key=lambda x: (len(x[0]), x[0]))
-                towers_data.append([tid, loc_name, sec_list])
-            ops_data.append([op_idx, towers_data])
-
-        records.append([lon, lat, entry["addr"], tech_mask, op_mask, ops_data])
-
-    print(f"Jedinstvenih lokacija: {len(records):,}")
-    return records
-
-
-def write_towers_js(records: list):
-    js = "const LOCS=" + json.dumps(records, ensure_ascii=False, separators=(",", ":")) + ";"
-    with open(TOWERS_JS, "w", encoding="utf-8") as f:
-        f.write(js)
-    size = os.path.getsize(TOWERS_JS)
-    print(f"Zapisano {TOWERS_JS} ({size/1024/1024:.2f} MB)")
-
-
-def write_meta_js(records: list, raw: bytes):
-    today = datetime.datetime.utcnow().strftime("%d.%m.%Y")
-    op_counts = [0, 0, 0]
-    for loc in records:
-        for op_idx, _ in loc[5]:
-            op_counts[op_idx] += 1
-
-    meta = {
-        "updated": today,
-        "locations": len(records),
-        "mts": op_counts[0],
-        "a1":  op_counts[1],
-        "yettel": op_counts[2],
-        "source_bytes": len(raw),
-    }
-    js = "const META=" + json.dumps(meta, ensure_ascii=False) + ";"
-    with open(META_JS, "w", encoding="utf-8") as f:
-        f.write(js)
-    print(f"Meta: {meta}")
-
-
-def main():
-    raw = fetch_csv()
-    h   = csv_hash(raw)
-    old = load_last_hash()
-
-    if h == old and "--force" not in sys.argv:
-        print("Podaci nisu promenjeni (hash identičan). Preskačem obradu.")
-        print("Koristite --force za prisilno ažuriranje.")
-        return 0
-
-    print("Novi podaci detektovani, obrađujem...")
-    records = process(raw)
-    write_towers_js(records)
-    write_meta_js(records, raw)
-    save_hash(h)
-    print("Gotovo!")
+def detect_tech(s: str) -> int:
+    """Vrati bit masku tehnologije."""
+    s = s.lower()
+    for key, bit in TECH_MAP.items():
+        if key in s:
+            return bit
     return 0
 
+# ── Parsiranje CSV-a ──────────────────────────────────────────────────────────
+
+def parse_csv(raw: bytes):
+    """
+    Parsira RATEL CSV i vraća:
+      locs_data  — dict klučevan po (lat, lon) → agregisani podaci lokacije
+      op_counts  — dict {op_idx: set of tower_ids}  za statistiku
+    """
+    text = raw.decode("utf-8-sig", errors="replace")
+    reader = csv.DictReader(io.StringIO(text), delimiter=";")
+
+    # Lokacije: (lat, lon) → { addr, tech_mask, op_mask, ops: {op_idx: {tower_id: [sektori]}} }
+    locs = {}
+    op_tower_ids = defaultdict(set)   # op_idx → set(tower_id)
+
+    for row in reader:
+        # Pokušaj da pronađeš relevantne kolone (RATEL CSV format može da varira)
+        lat_raw = row.get("Latitude") or row.get("LAT") or row.get("lat") or ""
+        lon_raw = row.get("Longitude") or row.get("LON") or row.get("lon") or ""
+        addr    = row.get("Address") or row.get("Adresa") or row.get("Lokacija") or ""
+        op_raw  = row.get("Operator") or row.get("operator") or ""
+        tech_raw= row.get("Technology") or row.get("Tehnologija") or row.get("tech") or ""
+        tower_id= row.get("BS_ID") or row.get("TowerID") or row.get("ID") or ""
+        sector  = row.get("Sector") or row.get("Sektor") or row.get("SEC") or "1"
+        freq    = row.get("Frequency") or row.get("Frekvencija") or row.get("FREQ") or "0"
+        loc_name= row.get("LocationName") or row.get("Naziv") or row.get("Name") or addr
+
+        try:
+            lat = float(lat_raw.replace(",", ".").strip())
+            lon = float(lon_raw.replace(",", ".").strip())
+        except (ValueError, AttributeError):
+            continue
+
+        op_idx  = detect_operator(op_raw)
+        if op_idx < 0:
+            continue
+        tech_bit = detect_tech(tech_raw)
+        tech_name = {1:"2G", 2:"3G", 4:"4G", 8:"5G"}.get(tech_bit, "4G")
+
+        key = (round(lon, 5), round(lat, 5))
+        if key not in locs:
+            locs[key] = {
+                "addr": addr.strip(),
+                "tech_mask": 0,
+                "op_mask": 0,
+                "ops": defaultdict(lambda: defaultdict(list)),
+                "loc_name": loc_name.strip(),
+            }
+
+        loc = locs[key]
+        loc["tech_mask"] |= tech_bit
+        loc["op_mask"]   |= (1 << op_idx)
+        loc["ops"][op_idx][tower_id].append((sector, freq, tech_name))
+        op_tower_ids[op_idx].add(tower_id)
+
+    return locs, op_tower_ids
+
+# ── Generisanje towers.js ─────────────────────────────────────────────────────
+
+def build_towers_js(locs: dict) -> str:
+    """Generiši kompaktan JS array za Leaflet mapu."""
+    lines = ["/* Auto-generisano — ne menjati ručno */", "const LOCS=["]
+
+    for (lon, lat), d in locs.items():
+        ops_data = []
+        for op_idx, towers in sorted(d["ops"].items()):
+            tower_list = []
+            for tid, sectors in towers.items():
+                tower_list.append([tid, d["loc_name"], sectors])
+            ops_data.append([op_idx, tower_list])
+
+        addr_esc = d["addr"].replace('"', '\\"')
+        name_esc = d["loc_name"].replace('"', '\\"')
+        entry = json.dumps(
+            [lon, lat, addr_esc, d["tech_mask"], d["op_mask"], ops_data],
+            ensure_ascii=False, separators=(",", ":")
+        )
+        lines.append(entry + ",")
+
+    lines.append("];")
+    return "\n".join(lines)
+
+# ── Poređenje i detekcija promena ─────────────────────────────────────────────
+
+def diff_tower_ids(old_ids: dict, new_ids: dict) -> dict:
+    """
+    Poredi setove tower_id-jeva po operateru.
+    Vraća {op_idx: set_novih_id} — samo novi tornjevi.
+    """
+    result = {}
+    for op_idx in range(3):
+        old_set = old_ids.get(op_idx, set())
+        new_set = new_ids.get(op_idx, set())
+        added = new_set - old_set
+        if added:
+            result[op_idx] = added
+    return result
+
+def load_prev_tower_ids() -> dict:
+    """Učitaj prethodni skup tower ID-jeva iz fajla."""
+    path = os.path.join(DATA_DIR, ".prev_tower_ids.json")
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            raw = json.load(f)
+            return {int(k): set(v) for k, v in raw.items()}
+    return {}
+
+def save_tower_ids(ids: dict):
+    path = os.path.join(DATA_DIR, ".prev_tower_ids.json")
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump({str(k): list(v) for k, v in ids.items()}, f)
+
+# ── Generisanje meta.js ───────────────────────────────────────────────────────
+
+def build_meta_js(updated: str, changelog: list) -> str:
+    """Generiši data/meta.js sa svim meta-podacima."""
+    last_change = changelog[0]["date"] if changelog else None
+
+    lines = [
+        "/* Auto-generisano — ne menjati ručno */",
+        "const META = {",
+        f'  updated: "{updated}",',
+    ]
+    if last_change:
+        lines.append(f'  lastChange: "{last_change}",')
+
+    # Changelog array (do MAX_CHANGELOG unosa)
+    cl_json = json.dumps(changelog[:MAX_CHANGELOG], ensure_ascii=False, indent=2)
+    # Uvuci 2 razmaka
+    cl_indented = "\n".join("  " + l for l in cl_json.splitlines())
+    lines.append(f"  changelog: {cl_indented},")
+    lines.append("};")
+
+    return "\n".join(lines)
+
+# ── Glavni tok ────────────────────────────────────────────────────────────────
+
+def main():
+    os.makedirs(DATA_DIR, exist_ok=True)
+
+    print(f"[{now_str()}] Preuzimanje CSV sa RATEL-a...")
+    try:
+        req = urllib.request.Request(RATEL_URL, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            raw = resp.read()
+    except Exception as e:
+        print(f"  GREŠKA: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    current_hash = sha256_of(raw)
+    prev_hash    = load_prev_hash()
+
+    updated_str  = now_str()
+    changelog    = load_changelog()
+
+    if current_hash == prev_hash:
+        print("  Nema promena u CSV-u. Ažuriramo samo 'updated' vreme u meta.js.")
+        # Samo osvežimo updated vreme, changelog ostaje isti
+        meta_js = build_meta_js(updated_str, changelog)
+        with open(META_JS, "w", encoding="utf-8") as f:
+            f.write(meta_js)
+        print("  data/meta.js ažuriran.")
+        return  # towers.js ne treba ponovo generisati
+
+    print("  ✓ Detektovane promene! Parsiranje CSV-a...")
+    locs, new_tower_ids = parse_csv(raw)
+    prev_tower_ids = load_prev_tower_ids()
+
+    # Detekcija novih tornjeva po operateru
+    added = diff_tower_ids(prev_tower_ids, new_tower_ids)
+
+    total_new = sum(len(v) for v in added.values())
+    print(f"  Novi tornjevi: ukupno {total_new} "
+          f"(MTS: {len(added.get(0,set()))}, "
+          f"A1: {len(added.get(1,set()))}, "
+          f"Yettel: {len(added.get(2,set()))})")
+
+    # Generiši towers.js
+    towers_js = build_towers_js(locs)
+    with open(TOWERS_JS, "w", encoding="utf-8") as f:
+        f.write(towers_js)
+    print(f"  data/towers.js generisan ({len(locs):,} lokacija).")
+
+    # Dodaj unos u changelog samo ako ima novih tornjeva
+    if total_new > 0 or not prev_tower_ids:
+        entry = {
+            "date":   updated_str,
+            "total":  total_new,
+            "mts":    len(added.get(0, set())),
+            "a1":     len(added.get(1, set())),
+            "yettel": len(added.get(2, set())),
+        }
+
+        # Detalji: do 50 reprezentativnih novih stanica
+        details = []
+        for op_idx, tower_set in sorted(added.items()):
+            op_name = OP_NAMES[op_idx]
+            for tid in list(tower_set)[:20]:  # max 20 po operateru
+                # Pronađi lokaciju i tehnologije za ovaj tower_id
+                for (lon, lat), d in locs.items():
+                    if op_idx in d["ops"] and tid in d["ops"][op_idx]:
+                        sectors = d["ops"][op_idx][tid]
+                        techs = list({s[2] for s in sectors})
+                        details.append({
+                            "op":   op_name,
+                            "name": d["loc_name"],
+                            "tech": sorted(techs),
+                            "addr": d["addr"]
+                        })
+                        break
+
+        if details:
+            entry["details"] = details[:50]
+
+        changelog.insert(0, entry)  # najnovije prvo
+        save_changelog(changelog)
+        print(f"  Changelog ažuriran ({len(changelog)} unosa ukupno).")
+
+    # Sačuvaj novi hash i tower IDs
+    save_hash(current_hash)
+    save_tower_ids(new_tower_ids)
+
+    # Generiši meta.js
+    meta_js = build_meta_js(updated_str, changelog)
+    with open(META_JS, "w", encoding="utf-8") as f:
+        f.write(meta_js)
+    print("  data/meta.js generisan.")
+
+    print(f"[{now_str()}] Gotovo! ✓")
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

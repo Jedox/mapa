@@ -27,8 +27,9 @@ RATEL_URL = "https://registar.ratel.rs/reg221/csv"   # prilagodi ako se URL prom
 DATA_DIR   = os.path.join(os.path.dirname(__file__), "..", "data")
 TOWERS_JS  = os.path.join(DATA_DIR, "towers.js")
 META_JS    = os.path.join(DATA_DIR, "meta.js")
-HASH_FILE  = os.path.join(DATA_DIR, ".csv_hash")       # čuva hash prethodnog CSV-a
+HASH_FILE      = os.path.join(DATA_DIR, ".last_hash")       # mora da odgovara workflow git add
 CHANGELOG_FILE = os.path.join(DATA_DIR, "changelog.json")  # persists između runa
+TOWER_IDS_FILE = os.path.join(DATA_DIR, ".prev_tower_ids.json")
 
 # Operateri — mapiranje naziva iz CSV-a na indeks
 OP_MAP = {
@@ -191,17 +192,15 @@ def diff_tower_ids(old_ids: dict, new_ids: dict) -> dict:
 
 def load_prev_tower_ids() -> dict:
     """Učitaj prethodni skup tower ID-jeva iz fajla."""
-    path = os.path.join(DATA_DIR, ".prev_tower_ids.json")
-    if os.path.exists(path):
-        with open(path, "r") as f:
+    if os.path.exists(TOWER_IDS_FILE):
+        with open(TOWER_IDS_FILE, "r") as f:
             raw = json.load(f)
             return {int(k): set(v) for k, v in raw.items()}
     return {}
 
 def save_tower_ids(ids: dict):
-    path = os.path.join(DATA_DIR, ".prev_tower_ids.json")
     os.makedirs(DATA_DIR, exist_ok=True)
-    with open(path, "w") as f:
+    with open(TOWER_IDS_FILE, "w") as f:
         json.dump({str(k): list(v) for k, v in ids.items()}, f)
 
 # ── Generisanje meta.js ───────────────────────────────────────────────────────
@@ -230,6 +229,11 @@ def build_meta_js(updated: str, changelog: list) -> str:
 # ── Glavni tok ────────────────────────────────────────────────────────────────
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--force", action="store_true", help="Prisilno ažuriranje čak i ako nema promena")
+    args = parser.parse_args()
+
     os.makedirs(DATA_DIR, exist_ok=True)
 
     print(f"[{now_str()}] Preuzimanje CSV sa RATEL-a...")
@@ -247,7 +251,7 @@ def main():
     updated_str  = now_str()
     changelog    = load_changelog()
 
-    if current_hash == prev_hash:
+    if current_hash == prev_hash and not args.force:
         print("  Nema promena u CSV-u. Ažuriramo samo 'updated' vreme u meta.js.")
         # Samo osvežimo updated vreme, changelog ostaje isti
         meta_js = build_meta_js(updated_str, changelog)

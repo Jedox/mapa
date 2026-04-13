@@ -745,7 +745,7 @@ function buildHistoryPanel() {
         const opClass = d.op === 'MTS' ? 'mts' : d.op === 'A1' ? 'a1' : 'yettel';
         const opColor = d.op === 'MTS' ? '#ff6b75' : d.op === 'A1' ? '#ff5ab8' : '#a8d96a';
         const techs = (d.tech||[]).map(t=>{
-          const cls = {2:t2g,3:'t3g',4:'t4g',5:'t5g'}[t[0]] || 't4g';
+          const cls = {'2':'t2g','3':'t3g','4':'t4g','5':'t5g'}[t[0]] || 't4g';
           return `<span class="tech-badge ${cls}">${t}</span>`;
         }).join(' ');
         return `<tr>

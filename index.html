@@ -189,18 +189,22 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16p
   .header-stats{
     width:100%;order:3;
     border-top:1px solid var(--border);
-    padding:5px 0 6px;
-    overflow-x:auto;flex-wrap:nowrap;
-    gap:0;scrollbar-width:none;
+    padding:4px 0 5px;
+    display:flex;flex-wrap:wrap;
+    gap:0;
     justify-content:flex-start;
   }
-  .header-stats::-webkit-scrollbar{display:none}
   .stat-pill{
     display:flex!important;font-size:10px;
-    padding:0 10px;border-right:1px solid var(--border);
+    padding:3px 10px;
+    border-right:1px solid var(--border);
+    border-bottom:1px solid var(--border);
     white-space:nowrap;flex-shrink:0;
+    width:50%;
+    box-sizing:border-box;
   }
-  .stat-pill:last-child{border-right:none}
+  .stat-pill:nth-child(2n){border-right:none}
+  .stat-pill:nth-last-child(-n+2){border-bottom:none}
   .sidebar{
     position:fixed;top:0;left:0;bottom:0;
     width:300px;max-width:90vw;
@@ -511,11 +515,19 @@ function goToCity(lat,lon,name){
 }
 
 /* ── Meta & Istorija ─────────────────────────────── */
+function stripYear(s) {
+  if(!s) return s;
+  // "2026-04-13 20:15" → "13.04 20:15"
+  var m = s.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}:\d{2})/);
+  if(m) return m[3]+'.'+m[2]+' '+m[4];
+  // fallback: remove 4-digit year
+  return s.replace(/\d{4}-?/, '').trim();
+}
 function initMeta() {
   if(typeof META==='undefined') return;
-  if(META.updated) document.getElementById('h-updated').textContent=META.updated;
+  if(META.updated) document.getElementById('h-updated').textContent=stripYear(META.updated);
   if(META.lastChange) {
-    document.getElementById('h-changed').textContent=META.lastChange;
+    document.getElementById('h-changed').textContent=stripYear(META.lastChange);
     document.getElementById('h-change-wrap').style.display='flex';
   }
   buildHistory();

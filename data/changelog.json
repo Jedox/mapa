@@ -1,5 +1,174 @@
 [
   {
+    "date": "2026-04-20 13:05",
+    "total": 911,
+    "mts": 0,
+    "a1": 0,
+    "yettel": 911,
+    "details": [
+      {
+        "op": "Yettel",
+        "name": "BG Vojvode Stepe 2",
+        "tech": [
+          "2G"
+        ],
+        "addr": "Stambena zgrada, ul. Vojvode Stepe 284, Beograd"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Blok 44",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Jurija Gagarina 155, Beograd."
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Staro Sajmište 2",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Ul. Sadika Ramiza, Beograd"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Kumodraška",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Kraljevačka, 72, Beograd"
+      },
+      {
+        "op": "Yettel",
+        "name": "Lajkovac",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 408/1, KO Pepeljevac, Lajkovac"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Zemun Muhar",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Dositejeva_9"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Filmski grad",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Arcibalda Rajsa bb, Beograd."
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Delta City",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Jurija Gagarina 16, Novi Beograd."
+      },
+      {
+        "op": "Yettel",
+        "name": "Belegiš",
+        "tech": [
+          "5G"
+        ],
+        "addr": "KP 694/4 KO Belegiš, Stara Pazova"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Paviljoni 3",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Džona  Kenedija 33"
+      },
+      {
+        "op": "Yettel",
+        "name": "Bajina Bašta",
+        "tech": [
+          "5G"
+        ],
+        "addr": "Bajina Bašta, KP 1589/5"
+      },
+      {
+        "op": "Yettel",
+        "name": "Ub 2",
+        "tech": [
+          "5G"
+        ],
+        "addr": "KP 423/1 KO Gunjevac SO Ub"
+      },
+      {
+        "op": "Yettel",
+        "name": "Bačka Topola 2",
+        "tech": [
+          "5G"
+        ],
+        "addr": "Backa Topola, Trg Zorana Ðindica 1"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Merkator",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Bulevar Umetnosti 4, Beograd"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Bežanijska Kosa 9",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Vespucijeva 36"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG PC Ušće",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Bulevar Mihajla Pupina 4, KP 2338, KO Novi Beograd."
+      },
+      {
+        "op": "Yettel",
+        "name": "Zabeo",
+        "tech": [
+          "5G"
+        ],
+        "addr": "KP133/2 KO Donje Tocane, Kuršumlija"
+      },
+      {
+        "op": "Yettel",
+        "name": "Futog",
+        "tech": [
+          "5G"
+        ],
+        "addr": "Futog, KP 3316, KO Futog"
+      },
+      {
+        "op": "Yettel",
+        "name": "Leštane",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Brdo Krcevine KP 1531, KO Leštane, SO Grocka."
+      },
+      {
+        "op": "Yettel",
+        "name": "BG YUBC",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Bulevar Mihaila Pupina 10z, Beograd"
+      }
+    ]
+  },
+  {
     "date": "2026-04-12 20:27",
     "total": 94095,
     "mts": 29286,

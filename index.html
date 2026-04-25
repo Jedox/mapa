@@ -102,43 +102,68 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16p
 #panel-history{display:none;flex:1;overflow-y:auto;background:var(--bg);padding:28px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent}
 #panel-history::-webkit-scrollbar{width:5px}
 #panel-history::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
-.history-title{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px}
-.history-subtitle{font-size:13px;color:var(--text3);line-height:1.5;margin-bottom:28px}
-.history-summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:28px}
-.summary-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
-.summary-card.mts{border-left:3px solid var(--mts)}
-.summary-card.a1{border-left:3px solid var(--a1)}
-.summary-card.yettel{border-left:3px solid var(--yettel)}
-.sc-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
-.sc-value{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent2);margin-bottom:2px}
-.sc-sub{font-size:11px;color:var(--text3)}
-.history-section-title{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.cl-entry{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden}
-.cl-entry-hdr{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;user-select:none}
-.cl-date{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent2);background:var(--accent-dim);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:3px 10px;white-space:nowrap;flex-shrink:0}
-.cl-summary{flex:1;min-width:0}
-.cl-summary-text{font-size:13px;color:var(--text);font-weight:500;margin-bottom:4px}
-.cl-pills{display:flex;gap:6px;flex-wrap:wrap}
-.op-pill{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:12px;display:flex;align-items:center;gap:4px}
-.op-pill.mts{background:rgba(230,57,70,.15);color:#ff6b75;border:1px solid rgba(230,57,70,.3)}
-.op-pill.a1{background:rgba(233,30,140,.15);color:#ff5ab8;border:1px solid rgba(233,30,140,.3)}
-.op-pill.yettel{background:rgba(139,195,74,.15);color:#a8d96a;border:1px solid rgba(139,195,74,.3)}
-.op-pill-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.op-pill.mts .op-pill-dot{background:#e63946}
-.op-pill.a1 .op-pill-dot{background:#e91e8c}
-.op-pill.yettel .op-pill-dot{background:#8bc34a}
-.cl-toggle{color:var(--text3);transition:transform .25s;flex-shrink:0}
-.cl-entry.expanded .cl-toggle{transform:rotate(180deg)}
-.cl-body{display:none;border-top:1px solid var(--border);padding:14px 16px}
-.cl-entry.expanded .cl-body{display:block}
-.cl-table{width:100%;border-collapse:collapse;font-size:11px}
-.cl-table th{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-bottom:1px solid var(--border);text-align:left;font-weight:400}
-.cl-table td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);font-size:11px}
+.hist-page{max-width:1100px;margin:0 auto}
+.hist-page-title{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:.04em}
+.hist-page-sub{font-size:12px;color:var(--text3);margin-bottom:24px}
+.hist-filter-row{display:flex;align-items:center;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.hist-filter-btn{font-family:var(--mono);font-size:10px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s}
+.hist-filter-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent2)}
+.hist-filter-btn[data-op="0"].active{background:rgba(230,57,70,.15);border-color:var(--mts);color:#ff6b75}
+.hist-filter-btn[data-op="1"].active{background:rgba(233,30,140,.15);border-color:var(--a1);color:#ff5ab8}
+.hist-filter-btn[data-op="2"].active{background:rgba(139,195,74,.15);border-color:var(--yettel);color:#a8d96a}
+/* Entry */
+.cl-entry{margin-bottom:32px}
+.cl-entry-date-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px}
+.cl-entry-date{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text)}
+.cl-entry-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent2);background:var(--accent-dim);border:1px solid rgba(245,158,11,.3);border-radius:20px;padding:4px 14px;white-space:nowrap}
+/* Stat cards */
+.cl-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.cl-stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.cl-stat-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.cl-stat-value{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--text)}
+.cl-stat-icon{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cl-stat-icon.bs{background:rgba(245,158,11,.15)}
+.cl-stat-icon.g5{background:rgba(99,153,34,.15)}
+.cl-stat-icon.g4{background:rgba(55,138,221,.15)}
+/* Per operator */
+.cl-ops-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
+.cl-op-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.cl-op-card.mts{border-top:2px solid var(--mts)}
+.cl-op-card.a1{border-top:2px solid var(--a1)}
+.cl-op-card.yettel{border-top:2px solid var(--yettel)}
+.cl-op-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.cl-op-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cl-op-name{font-family:var(--mono);font-size:12px;font-weight:700}
+.cl-op-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px}
+.cl-op-row:last-child{border-bottom:none}
+.cl-op-row-label{color:var(--text3);display:flex;align-items:center;gap:5px}
+.cl-op-row-val{font-family:var(--mono);font-weight:700;color:var(--text)}
+.cl-op-row-val.highlight{color:var(--accent2)}
+.cl-divider{height:1px;background:var(--border);margin:28px 0}
+/* Details expandable */
+.cl-details-toggle{font-family:var(--mono);font-size:10px;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:4px 0}
+.cl-details-toggle:hover{color:var(--text2)}
+.cl-details-body{display:none;margin-top:10px}
+.cl-entry.det-open .cl-details-body{display:block}
+.cl-entry.det-open .cl-det-arrow{transform:rotate(180deg)}
+.cl-det-arrow{transition:transform .2s;display:inline-block}
+.cl-table{width:100%;border-collapse:collapse;font-size:11px;background:var(--bg);border-radius:6px;overflow:hidden}
+.cl-table th{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-bottom:1px solid var(--border);text-align:left;font-weight:400}
+.cl-table td{padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);font-size:11px}
 .cl-table tr:last-child td{border-bottom:none}
+/* Empty */
 .history-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:var(--text3)}
 .history-empty-icon{font-size:32px;opacity:.4;margin-bottom:12px}
 .history-empty-title{font-family:var(--mono);font-size:13px;color:var(--text2);margin-bottom:6px}
 .history-empty-text{font-size:12px;color:var(--text3);line-height:1.6;max-width:360px}
+@media(max-width:640px){
+  .cl-stat-grid{grid-template-columns:1fr 1fr}
+  .cl-ops-grid{grid-template-columns:1fr}
+  .cl-stat-value{font-size:20px}
+}
+@media(max-width:400px){
+  .cl-stat-grid{grid-template-columns:1fr}
+}
 
 /* ── Popup ── */
 .leaflet-popup-content-wrapper{background:var(--bg2)!important;border:1px solid var(--border2)!important;border-radius:10px!important;box-shadow:0 8px 32px rgba(0,0,0,.7)!important;padding:0!important;min-width:320px;max-width:420px}
@@ -303,11 +328,18 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16p
   <div id="panel-map"><div id="map"></div></div>
 
   <div id="panel-history">
-    <div class="history-title">// ISTORIJA PROMENA</div>
-    <div class="history-subtitle">Praćenje izmena u RATEL CSV registru · svako ažuriranje je zabeleženo</div>
-    <div id="hist-summary" class="history-summary-grid" style="display:none"></div>
-    <div class="history-section-title">Evidencija ažuriranja</div>
-    <div id="hist-log"></div>
+    <div class="hist-page">
+      <div class="hist-page-title">// ISTORIJA PROMENA</div>
+      <div class="hist-page-sub">Praćenje izmena u RATEL CSV registru baznih stanica</div>
+      <div class="hist-filter-row">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Filter:</span>
+        <button class="hist-filter-btn active" data-op="all" onclick="filterHist(this)">Svi operateri</button>
+        <button class="hist-filter-btn" data-op="0" onclick="filterHist(this)">MTS</button>
+        <button class="hist-filter-btn" data-op="1" onclick="filterHist(this)">A1</button>
+        <button class="hist-filter-btn" data-op="2" onclick="filterHist(this)">Yettel</button>
+      </div>
+      <div id="hist-log"></div>
+    </div>
   </div>
 </div>
 
@@ -533,40 +565,133 @@ function initMeta() {
   buildHistory();
 }
 
+var histFilter='all';
+
+function filterHist(btn) {
+  document.querySelectorAll('.hist-filter-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  histFilter = btn.dataset.op;
+  buildHistory();
+}
+
+function fmtDate(s) {
+  if(!s) return s;
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) {
+    var months=['Jan','Feb','Mar','Apr','Maj','Jun','Jul','Avg','Sep','Okt','Nov','Dec'];
+    return months[parseInt(m[2])-1]+' '+parseInt(m[3])+', '+m[1];
+  }
+  return s;
+}
+
 function buildHistory() {
   var log=document.getElementById('hist-log');
-  var sumDiv=document.getElementById('hist-summary');
   var changelog=(META && META.changelog) ? META.changelog : [];
   if(!changelog.length) {
     log.innerHTML='<div class="history-empty"><div class="history-empty-icon">⏳</div><div class="history-empty-title">Čekanje na prve promene</div><div class="history-empty-text">Istorija će se automatski popuniti kada skripta detektuje izmene u CSV fajlu.</div></div>';
-    sumDiv.style.display='none'; return;
+    return;
   }
-  var totals=changelog.reduce(function(a,e){return{total:a.total+(e.total||0),mts:a.mts+(e.mts||0),a1:a.a1+(e.a1||0),yettel:a.yettel+(e.yettel||0)};},{total:0,mts:0,a1:0,yettel:0});
-  sumDiv.style.display='grid';
-  sumDiv.innerHTML='<div class="summary-card"><div class="sc-label">Ukupno novih BS</div><div class="sc-value">'+totals.total.toLocaleString()+'</div><div class="sc-sub">'+changelog.length+' ažuriranja</div></div>'+'<div class="summary-card mts"><div class="sc-label">MTS</div><div class="sc-value" style="color:#ff6b75">'+totals.mts.toLocaleString()+'</div></div>'+'<div class="summary-card a1"><div class="sc-label">A1</div><div class="sc-value" style="color:#ff5ab8">'+totals.a1.toLocaleString()+'</div></div>'+'<div class="summary-card yettel"><div class="sc-label">Yettel</div><div class="sc-value" style="color:#a8d96a">'+totals.yettel.toLocaleString()+'</div></div>';
-  log.innerHTML=changelog.map(function(entry,idx){
-    var pills=[
-      entry.mts?'<span class="op-pill mts"><span class="op-pill-dot"></span>MTS +'+entry.mts+'</span>':'',
-      entry.a1?'<span class="op-pill a1"><span class="op-pill-dot"></span>A1 +'+entry.a1+'</span>':'',
-      entry.yettel?'<span class="op-pill yettel"><span class="op-pill-dot"></span>Yettel +'+entry.yettel+'</span>':''
-    ].filter(Boolean).join('');
-    var body='';
-    if(entry.details && entry.details.length) {
-      var rows=entry.details.map(function(d){
+
+  log.innerHTML = changelog.map(function(entry, idx) {
+    var total = entry.total||0;
+    var mts = entry.mts||0;
+    var a1 = entry.a1||0;
+    var yettel = entry.yettel||0;
+
+    // Filter
+    if(histFilter==='0' && mts===0) return '';
+    if(histFilter==='1' && a1===0) return '';
+    if(histFilter==='2' && yettel===0) return '';
+
+    // Stat cards
+    var statCards = [
+      {label:'NOVE STANICE', val:total, icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="10" y="2" width="4" height="20"/><path d="M5 6Q12 3 19 6M3 11Q12 7 21 11M1 16Q12 11 23 16"/></svg>', cls:'bs'},
+      {label:'MTS STANICE', val:mts, icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e63946" stroke-width="2"><rect x="10" y="2" width="4" height="20"/><path d="M5 6Q12 3 19 6M3 11Q12 7 21 11M1 16Q12 11 23 16"/></svg>', cls:'bs'},
+      {label:'A1 STANICE', val:a1, icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e91e8c" stroke-width="2"><rect x="10" y="2" width="4" height="20"/><path d="M5 6Q12 3 19 6M3 11Q12 7 21 11M1 16Q12 11 23 16"/></svg>', cls:'bs'},
+      {label:'YETTEL STANICE', val:yettel, icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8bc34a" stroke-width="2"><rect x="10" y="2" width="4" height="20"/><path d="M5 6Q12 3 19 6M3 11Q12 7 21 11M1 16Q12 11 23 16"/></svg>', cls:'bs'},
+    ].filter(function(c){
+      if(histFilter==='0') return c.label.indexOf('YETTEL')<0 && c.label.indexOf('A1')<0;
+      if(histFilter==='1') return c.label.indexOf('MTS')<0 && c.label.indexOf('YETTEL')<0;
+      if(histFilter==='2') return c.label.indexOf('MTS')<0 && c.label.indexOf('A1')<0;
+      return true;
+    });
+
+    var statsHtml = '<div class="cl-stat-grid">'+statCards.map(function(c){
+      return '<div class="cl-stat-card"><div><div class="cl-stat-label">'+c.label+'</div><div class="cl-stat-value">'+c.val.toLocaleString()+'</div></div><div class="cl-stat-icon '+c.cls+'">'+c.icon+'</div></div>';
+    }).join('')+'</div>';
+
+    // Per operator cards
+    var opData = [
+      {name:'MTS', cls:'mts', dot:'#e63946', color:'#ff6b75', val:mts},
+      {name:'A1', cls:'a1', dot:'#e91e8c', color:'#ff5ab8', val:a1},
+      {name:'Yettel', cls:'yettel', dot:'#8bc34a', color:'#a8d96a', val:yettel},
+    ].filter(function(o){
+      if(histFilter==='0') return o.name==='MTS';
+      if(histFilter==='1') return o.name==='A1';
+      if(histFilter==='2') return o.name==='Yettel';
+      return true;
+    });
+
+    var opsHtml = '<div class="cl-ops-grid">'+opData.map(function(o){
+      // Count details for this op
+      var opDetails = (entry.details||[]).filter(function(d){return d.op===o.name;});
+      var techCounts = {};
+      opDetails.forEach(function(d){(d.tech||[]).forEach(function(t){techCounts[t]=(techCounts[t]||0)+1;});});
+      var techRows = ['2G','3G','4G','5G'].map(function(t){
+        var n = techCounts[t]||0;
+        var cls = {'2G':'t2g','3G':'t3g','4G':'t4g','5G':'t5g'}[t];
+        return '<div class="cl-op-row"><div class="cl-op-row-label"><span class="tech-badge '+cls+'">'+t+'</span></div><div class="cl-op-row-val'+(n>0?' highlight':'')+'">'+n+'</div></div>';
+      }).join('');
+      return '<div class="cl-op-card '+o.cls+'"><div class="cl-op-header"><div class="cl-op-dot" style="background:'+o.dot+'"></div><div class="cl-op-name" style="color:'+o.color+'">'+o.name+'</div></div>'+
+        '<div class="cl-op-row"><div class="cl-op-row-label">Nove stanice</div><div class="cl-op-row-val highlight">'+o.val+'</div></div>'+
+        techRows+
+        '</div>';
+    }).join('')+'</div>';
+
+    // Details table
+    var detHtml = '';
+    var details = (entry.details||[]).filter(function(d){
+      if(histFilter==='0') return d.op==='MTS';
+      if(histFilter==='1') return d.op==='A1';
+      if(histFilter==='2') return d.op==='Yettel';
+      return true;
+    });
+    if(details.length) {
+      var rows = details.map(function(d){
         var techClsMap={'2G':'t2g','3G':'t3g','4G':'t4g','5G':'t5g'};
         var techs=(d.tech||[]).map(function(t){return '<span class="tech-badge '+(techClsMap[t]||'t4g')+'">'+t+'</span>';}).join(' ');
         var opColor=d.op==='MTS'?'#ff6b75':d.op==='A1'?'#ff5ab8':'#a8d96a';
-        return '<tr><td style="color:'+opColor+';font-weight:700">'+d.op+'</td><td style="color:var(--text)">'+d.name+'</td><td>'+techs+'</td><td style="color:var(--text3);font-size:10px">'+d.addr+'</td></tr>';
+        return '<tr><td style="color:'+opColor+';font-weight:700;font-family:var(--mono)">'+d.op+'</td><td style="color:var(--text)">'+d.name+'</td><td>'+techs+'</td><td style="color:var(--text3)">'+d.addr+'</td></tr>';
       }).join('');
-      body='<div class="cl-body"><table class="cl-table"><thead><tr><th>Operator</th><th>Lokacija</th><th>Tehnol.</th><th>Adresa</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+      detHtml = '<div onclick="toggleDet('+idx+')" class="cl-details-toggle">'+
+        '<span class="cl-det-arrow">▼</span> Detalji ('+details.length+' stanica)</div>'+
+        '<div class="cl-details-body">'+
+        '<table class="cl-table"><thead><tr><th>Operator</th><th>Lokacija</th><th>Tehnol.</th><th>Adresa</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
     }
-    return '<div class="cl-entry" id="cle-'+idx+'"><div class="cl-entry-hdr" onclick="toggleCL('+idx+')"><div class="cl-date">'+entry.date+'</div><div class="cl-summary"><div class="cl-summary-text">+'+(entry.total||0)+' novih baznih stanica</div><div class="cl-pills">'+pills+'</div></div><svg class="cl-toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg></div>'+body+'</div>';
-  }).join('');
+
+    var divider = idx < changelog.length-1 ? '<div class="cl-divider"></div>' : '';
+
+    return '<div class="cl-entry" id="cle-'+idx+'">'+
+      '<div class="cl-entry-date-row">'+
+        '<div class="cl-entry-date">'+fmtDate(entry.date)+'</div>'+
+        '<div class="cl-entry-badge">+'+total+' NOVIH STANICA</div>'+
+      '</div>'+
+      statsHtml+
+      '<div style="margin-bottom:10px;font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase">Po operateru</div>'+
+      opsHtml+
+      detHtml+
+      divider+
+    '</div>';
+  }).filter(Boolean).join('');
+
+  if(!log.innerHTML.trim()) {
+    log.innerHTML='<div class="history-empty"><div class="history-empty-icon">🔍</div><div class="history-empty-title">Nema promena za ovog operatera</div></div>';
+  }
 }
 
-function toggleCL(idx){
+function toggleDet(idx){
   var el=document.getElementById('cle-'+idx);
-  if(el) el.classList.toggle('expanded');
+  if(el) el.classList.toggle('det-open');
 }
 
 /* ── Init ────────────────────────────────────────── */

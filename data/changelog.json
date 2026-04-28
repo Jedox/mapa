@@ -1,5 +1,414 @@
 [
   {
+    "date": "2026-04-28 05:28",
+    "total": 102746,
+    "mts": 35430,
+    "a1": 25157,
+    "yettel": 42159,
+    "details": [
+      {
+        "op": "MTS",
+        "name": "BG-MAKEDONSKA",
+        "tech": [
+          "2G"
+        ],
+        "addr": "MAKEDONSKA 29, BEOGRAD, KROVNA TERASA IZNAD SESTOG SPRATA ZGRADE ZA POSTAVLJANJE OPREME I FASADA OSMOG SPRATA ZA POSTAVLJANJE ANTENA BEOGRAD, STARI GR"
+      },
+      {
+        "op": "MTS",
+        "name": "BG-MAXI BLOK 63 NR 3500",
+        "tech": [
+          "5G"
+        ],
+        "addr": "NEHRUOVA 61, BEOGRAD BEOGRAD, NOVI BEOGRAD"
+      },
+      {
+        "op": "MTS",
+        "name": "DEVOJACKI BUNAR (CETIN) LTE 800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 6526/4 KO BANATSKI KARLOVAC, DEVOJACKI BUNAR ALIBUNAR"
+      },
+      {
+        "op": "MTS",
+        "name": "BG-DZONA KENEDIJA (PAVILJONI) UMTS",
+        "tech": [
+          "3G"
+        ],
+        "addr": "DZONA KENEDIJA 34, NOVI BEOGRAD BEOGRAD, NOVI BEOGRAD"
+      },
+      {
+        "op": "MTS",
+        "name": "UE-TRG PARTIZANA LTE 800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "JUG BODANOVA 1, UZICE UZICE"
+      },
+      {
+        "op": "MTS",
+        "name": "DONJA LJUBOVIDJA (ETV) UMTS",
+        "tech": [
+          "3G"
+        ],
+        "addr": "STUB RTS-A, KP 2400, KO GRACANICA, DONJA LJUBOVIDJA, LJUBOVIJA LJUBOVIJA"
+      },
+      {
+        "op": "MTS",
+        "name": "OTANJ (ETS) LTE 800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 111, KO OTANJ POZEGA"
+      },
+      {
+        "op": "MTS",
+        "name": "SMOLJINAC (CT)",
+        "tech": [
+          "2G"
+        ],
+        "addr": "SMOLJINAC, KP.BR.4484 KO SMOLJINAC MALO CRNICE"
+      },
+      {
+        "op": "MTS",
+        "name": "SUSARA LTE 800 (CT)",
+        "tech": [
+          "4G"
+        ],
+        "addr": "MESTO SUSARA,KP 5106, KO IZBISTE VRSAC"
+      },
+      {
+        "op": "MTS",
+        "name": "BANJA KOVILJACA 3 (DOT TOWERS) (CT)",
+        "tech": [
+          "2G"
+        ],
+        "addr": "UL. MARSALA TITA BB, KP 140/1, K.O.BANJA KOVILJACA LOZNICA"
+      },
+      {
+        "op": "MTS",
+        "name": "BG-KARABURMA LTE 800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KROVNA TERASA ZGRADE, URALSKA 36, KARABURMA BEOGRAD, PALILULA (BEOGRAD)"
+      },
+      {
+        "op": "MTS",
+        "name": "POLJANE-PRIBOJ (ETV) LTE 1800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "STUB RTS-A, KP 514/2, KO HERCEGOVACKA GOLESA, PRIBOJ PRIBOJ"
+      },
+      {
+        "op": "MTS",
+        "name": "BGM-MAXI KUMODRASKA LTE 1800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KUMODRASKA 97, KP 6253, KO VOZDOVAC BEOGRAD, VOZDOVAC"
+      },
+      {
+        "op": "MTS",
+        "name": "NI-ZARKA ZRENJANINA VAR.2 LTE 1800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "ZARKA ZRENJANINA 19A, NIS NIS, PANTELEJ"
+      },
+      {
+        "op": "MTS",
+        "name": "BG-BORCA GREDA LTE 1800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 1288, KO BORCA BEOGRAD, PALILULA (BEOGRAD)"
+      },
+      {
+        "op": "MTS",
+        "name": "BG-BATAJNICA LTE 2100 (CT)",
+        "tech": [
+          "4G"
+        ],
+        "addr": "ATC BATAJNICA, MAJKE JUGOVICA 16, BATAJNICA BEOGRAD, ZEMUN"
+      },
+      {
+        "op": "MTS",
+        "name": "CANTAVIR LTE 1800 (CT)",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 2991, 24220 KO CANTAVIR SUBOTICA"
+      },
+      {
+        "op": "MTS",
+        "name": "KUSTILJ (CETIN) LTE 800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 646, KO KUSTILJ, VRSAC VRSAC"
+      },
+      {
+        "op": "MTS",
+        "name": "BG-BANJICKI VENAC (FK CZ) LTE 2100",
+        "tech": [
+          "4G"
+        ],
+        "addr": "LJUTICE BOGDANA 1, BEOGRAD BEOGRAD, SAVSKI VENAC"
+      },
+      {
+        "op": "MTS",
+        "name": "SVILAJNAC TE MORAVA V2 LTE 1800",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 69, KO DUBLJE, TE MORAVA, DJURE DJAKOVICA BB, SVILAJNAC SVILAJNAC"
+      },
+      {
+        "op": "A1",
+        "name": "NIS (MEDIANA)",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 6260/1, KO Niš Ćele Kula, Niš, Vojvode Tankosića 9"
+      },
+      {
+        "op": "A1",
+        "name": "KOPAONIK",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 4/73, KO Kopaonik, Raška"
+      },
+      {
+        "op": "A1",
+        "name": "BEOGRAD (NOVI BEOGRAD)",
+        "tech": [
+          "4G"
+        ],
+        "addr": "Kp 534/30 KO Novi Beograd"
+      },
+      {
+        "op": "A1",
+        "name": "BEOGRAD (ZVEZDARA)",
+        "tech": [
+          "5G"
+        ],
+        "addr": "KP 13506, KO Zvezdara, Beograd, Pljevaljska BB"
+      },
+      {
+        "op": "A1",
+        "name": "BEOGRAD (NOVI BEOGRAD)",
+        "tech": [
+          "5G"
+        ],
+        "addr": "KP 5703/4, KO Novi Beograd, Beograd, Dr. Ivana Ribara 14"
+      },
+      {
+        "op": "A1",
+        "name": "LESKOVICA",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP br.1162, KO Leskovica"
+      },
+      {
+        "op": "A1",
+        "name": "BACKA TOPOLA",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 4020, KO Njegoševo, Bačka Topola"
+      },
+      {
+        "op": "A1",
+        "name": "LESKOVAC",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 5402, KO Leskovac, Trg revolucije 45"
+      },
+      {
+        "op": "A1",
+        "name": "VRANJE",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 11957, KO Vranje 1, KO Vranje, Partizanski put 144"
+      },
+      {
+        "op": "A1",
+        "name": "BEOGRAD (ZEMUN)",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 15426/1, KO Zemun, Zemun, Ratarski put 37a"
+      },
+      {
+        "op": "A1",
+        "name": "MASOVICE",
+        "tech": [
+          "4G"
+        ],
+        "addr": "k.p. 605,606 KO Masovice"
+      },
+      {
+        "op": "A1",
+        "name": "PIVNICE",
+        "tech": [
+          "2G"
+        ],
+        "addr": "KP 1659/1, KP 1659/2, KO Pivnica, Bačka Palanka, Štefanikova 68"
+      },
+      {
+        "op": "A1",
+        "name": "KNEZEVAC",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 4004, KO Štavalj, Sjenica"
+      },
+      {
+        "op": "A1",
+        "name": "BEOGRAD (NOVI BEOGRAD)",
+        "tech": [
+          "2G"
+        ],
+        "addr": "Antifašističke borbe bb, Novi Beograd"
+      },
+      {
+        "op": "A1",
+        "name": "INDJIJA",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KO Inđija, Inđija, Vojvode Stepe 23/Vojvode Putnika BB"
+      },
+      {
+        "op": "A1",
+        "name": "BEDINA VAROS",
+        "tech": [
+          "2G"
+        ],
+        "addr": "KP 462, KO Bedina Varoš, Ivanjica"
+      },
+      {
+        "op": "A1",
+        "name": "PLAVKOVO",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 223/2, KO Tusnice-Plakovo, Raška"
+      },
+      {
+        "op": "A1",
+        "name": "TUTIN",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 2/1, KO Tutin, Brdo Gradac"
+      },
+      {
+        "op": "A1",
+        "name": "KAC",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 4392/1, KO Kać, Novi Sad"
+      },
+      {
+        "op": "A1",
+        "name": "NOVI SAD",
+        "tech": [
+          "5G"
+        ],
+        "addr": "KP 7540/1, KO Novi Sad 1, Novi Sad, Hajduk Veljkova 11"
+      },
+      {
+        "op": "Yettel",
+        "name": "Šašinci",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP 299 KO Šašinci Sremska Mitrovica"
+      },
+      {
+        "op": "Yettel",
+        "name": "Kučevo",
+        "tech": [
+          "3G"
+        ],
+        "addr": "kota 213, KP 3708, KO Kucevo"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG SD Košutnjak",
+        "tech": [
+          "4G"
+        ],
+        "addr": "Blagoja Parovića"
+      },
+      {
+        "op": "Yettel",
+        "name": "Ristovac",
+        "tech": [
+          "5G"
+        ],
+        "addr": "KP 768, KO Ristovac, Vranje"
+      },
+      {
+        "op": "Yettel",
+        "name": "Ćuprija 4",
+        "tech": [
+          "5G"
+        ],
+        "addr": "Grada Janice br.10, Cuprija"
+      },
+      {
+        "op": "Yettel",
+        "name": "Šumane",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP4797, KO Šumane, Lebane"
+      },
+      {
+        "op": "Yettel",
+        "name": "Pećinci 3",
+        "tech": [
+          "3G"
+        ],
+        "addr": "KP 157 KO Pecinci"
+      },
+      {
+        "op": "Yettel",
+        "name": "BG Senjak 5",
+        "tech": [
+          "4G"
+        ],
+        "addr": "Bulevar Vojvode Mišića br. 39b/v, Beograd"
+      },
+      {
+        "op": "Yettel",
+        "name": "Tešica",
+        "tech": [
+          "4G"
+        ],
+        "addr": "KP br. 5054 KO Tešica"
+      },
+      {
+        "op": "Yettel",
+        "name": "Štitar",
+        "tech": [
+          "3G"
+        ],
+        "addr": "Objekat MTS-a Štitar"
+      }
+    ]
+  },
+  {
     "date": "2026-04-27 08:04",
     "total": 12267,
     "mts": 9889,
